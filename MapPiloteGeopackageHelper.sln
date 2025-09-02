@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkLoadPerformaceTester", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperHelloWorld", "MapPiloteGeopackageHelperHelloWorld\MapPiloteGeopackageHelperHelloWorld.csproj", "{5335D80F-471E-4A48-BED3-E163F949F35E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperSchemaBrowser", "MapPiloteGeopackageHelperSchemaBrowser\MapPiloteGeopackageHelperSchemaBrowser.csproj", "{30F69021-96B7-C6CF-CFEB-51C43A9052EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5335D80F-471E-4A48-BED3-E163F949F35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5335D80F-471E-4A48-BED3-E163F949F35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5335D80F-471E-4A48-BED3-E163F949F35E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
