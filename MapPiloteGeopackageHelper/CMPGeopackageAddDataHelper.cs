@@ -1,32 +1,10 @@
-﻿/* Licence...
- * MIT License
- *
- * Copyright (c) 2025 Anders Dahlgren
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to deal 
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is 
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
 using Microsoft.Data.Sqlite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using SQLitePCL;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 [assembly: InternalsVisibleTo("TestMapPiloteGeoPackageHandler")]
 
@@ -108,6 +86,88 @@ namespace MapPiloteGeopackageHelper
 
                 Console.WriteLine($"Successfully added point to layer '{layerName}' in GeoPackage");
             }
+        }
+
+        /// <summary>
+        /// Bulk insert features (attributes + optional geometry) with transactional batching.
+        /// </summary>
+        public static void BulkInsertFeatures(
+            string geoPackagePath,
+            string layerName,
+            IEnumerable<FeatureRecord> features,
+            int srid = 3006,
+            int batchSize = 1000,
+            string geometryColumn = "geom")
+        {
+            if (!File.Exists(geoPackagePath))
+                throw new FileNotFoundException($"GeoPackage file not found: {geoPackagePath}");
+
+            using var connection = new SqliteConnection($"Data Source={geoPackagePath}");
+            connection.Open();
+
+            // Get column information for attributes (excludes id and geometry)
+            var columnInfo = GetColumnInfoWithTypes(connection, layerName);
+            var columnNames = columnInfo.Select(c => c.Name).ToList();
+
+            var columnList = string.Join(", ", columnNames.Concat(new[] { geometryColumn }));
+            var parameterList = string.Join(", ", columnNames.Select(c => $"@{c}").Concat(new[] { "@geom" }));
+            var insertSql = $"INSERT INTO {layerName} ({columnList}) VALUES ({parameterList})";
+
+            using var command = new SqliteCommand(insertSql, connection);
+
+            // Create parameters once
+            foreach (var name in columnNames)
+                command.Parameters.AddWithValue($"@{name}", DBNull.Value);
+            command.Parameters.AddWithValue("@geom", DBNull.Value);
+
+            // Begin first transaction
+            SqliteTransaction? txn = connection.BeginTransaction();
+            command.Transaction = txn;
+
+            var wkbWriter = new WKBWriter();
+            int i = 0;
+
+            foreach (var feature in features)
+            {
+                // Bind attribute values from the provided dictionary; missing keys treated as NULL
+                for (int idx = 0; idx < columnNames.Count; idx++)
+                {
+                    var col = columnInfo[idx];
+                    feature.Attributes.TryGetValue(col.Name, out var raw);
+                    var valForValidation = raw ?? string.Empty;
+                    ValidateDataTypeCompatibility(col, valForValidation, idx);
+
+                    var converted = ConvertValueToSqliteType(col, valForValidation);
+                    command.Parameters[$"@{col.Name}"].Value = converted ?? DBNull.Value;
+                }
+
+                // Bind geometry (optional)
+                if (feature.Geometry is null)
+                {
+                    command.Parameters["@geom"].Value = DBNull.Value;
+                }
+                else
+                {
+                    var wkb = wkbWriter.Write(feature.Geometry);
+                    var gpkgBlob = CreateGpkgBlob(wkb, srid);
+                    command.Parameters["@geom"].Value = gpkgBlob;
+                }
+
+                command.ExecuteNonQuery();
+
+                i++;
+                if (i % batchSize == 0)
+                {
+                    txn!.Commit();
+                    txn.Dispose();
+                    txn = connection.BeginTransaction();
+                    command.Transaction = txn;
+                }
+            }
+
+            // Final commit if there are pending operations in the current transaction
+            txn?.Commit();
+            txn?.Dispose();
         }
 
         /// <summary>

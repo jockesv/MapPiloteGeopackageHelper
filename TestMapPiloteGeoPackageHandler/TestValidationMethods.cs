@@ -124,11 +124,11 @@ namespace TestMapPiloteGeoPackageHandler
 
             // Act & Assert - Should not throw for empty/null values
             CGeopackageAddDataHelper.ValidateDataTypeCompatibility(intColumn, "", 0);
-            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(intColumn, null, 0);
+            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(intColumn, null!, 0);
             CGeopackageAddDataHelper.ValidateDataTypeCompatibility(realColumn, "", 0);
-            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(realColumn, null, 0);
+            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(realColumn, null!, 0);
             CGeopackageAddDataHelper.ValidateDataTypeCompatibility(textColumn, "", 0);
-            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(textColumn, null, 0);
+            CGeopackageAddDataHelper.ValidateDataTypeCompatibility(textColumn, null!, 0);
         }
 
         [TestMethod]

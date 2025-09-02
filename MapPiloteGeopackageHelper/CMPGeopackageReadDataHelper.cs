@@ -1,4 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using System.Globalization;
 
 namespace MapPiloteGeopackageHelper
 {
@@ -267,5 +270,65 @@ namespace MapPiloteGeopackageHelper
         public sealed record GeopackageInfo(
             List<LayerInfo> Layers,
             List<SrsInfo> SpatialRefSystems);
+
+        // Stream features as FeatureRecord for a table; decode geometry optionally
+        public static IEnumerable<FeatureRecord> ReadFeatures(
+            string geoPackageFilePath,
+            string tableName,
+            string geometryColumn = "geom",
+            bool includeGeometry = true)
+        {
+            using var connection = new SqliteConnection($"Data Source={geoPackageFilePath}");
+            connection.Open();
+
+            // Discover columns and pick attribute columns (exclude id and geometry)
+            var columns = new List<ColumnInfo>();
+            using (var tCmd = new SqliteCommand($"PRAGMA table_info({tableName})", connection))
+            using (var tReader = tCmd.ExecuteReader())
+            {
+                while (tReader.Read())
+                {
+                    var colName = tReader.GetString(1);
+                    var colType = tReader.IsDBNull(2) ? string.Empty : tReader.GetString(2);
+                    var notNull = !tReader.IsDBNull(3) && tReader.GetInt32(3) == 1;
+                    var isPk = !tReader.IsDBNull(5) && tReader.GetInt32(5) == 1;
+                    columns.Add(new ColumnInfo(colName, colType, notNull, isPk));
+                }
+            }
+
+            var attributeColumns = columns
+                .Where(c => !string.Equals(c.Name, "id", StringComparison.OrdinalIgnoreCase)
+                         && !string.Equals(c.Name, geometryColumn, StringComparison.OrdinalIgnoreCase))
+                .Select(c => c.Name)
+                .ToList();
+
+            using var cmd = new SqliteCommand($"SELECT * FROM {tableName}", connection);
+            using var reader = cmd.ExecuteReader();
+
+            var geomOrdinal = -1;
+            try { geomOrdinal = reader.GetOrdinal(geometryColumn); } catch { geomOrdinal = -1; }
+
+            var wkbReader = includeGeometry ? new WKBReader() : null;
+
+            while (reader.Read())
+            {
+                var attrs = new Dictionary<string, string?>(StringComparer.Ordinal);
+                foreach (var name in attributeColumns)
+                {
+                    var ord = reader.GetOrdinal(name);
+                    attrs[name] = reader.IsDBNull(ord) ? null : Convert.ToString(reader.GetValue(ord), CultureInfo.InvariantCulture);
+                }
+
+                Geometry? geometry = null;
+                if (includeGeometry && geomOrdinal >= 0 && !reader.IsDBNull(geomOrdinal))
+                {
+                    var gpkgBlob = (byte[])reader.GetValue(geomOrdinal);
+                    var wkb = StripGpkgHeader(gpkgBlob);
+                    geometry = wkbReader!.Read(wkb);
+                }
+
+                yield return new FeatureRecord(geometry, attrs);
+            }
+        }
     }
 }

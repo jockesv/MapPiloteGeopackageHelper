@@ -173,26 +173,6 @@ namespace MapPiloteGeopackageHelper
             }
         }
 
-        internal static Polygon CreatePolygonFromPiposId(int piposId)
-        {
-            // Use the existing logic from CGeotools to create geometry
-            long x = SpatialConnUtils.CGeotools.XFromId(piposId);
-            long y = SpatialConnUtils.CGeotools.YFromId(piposId);
-
-            // Create a 250x250 meter tile polygon
-            var coordinates = new[]
-            {
-            new Coordinate(x, y),
-            new Coordinate(x + 250, y),
-            new Coordinate(x + 250, y + 250),
-            new Coordinate(x, y + 250),
-            new Coordinate(x, y) // Close the polygon
-        };
-
-            var factory = new GeometryFactory();
-            return factory.CreatePolygon(coordinates);
-        }
-
         internal static byte[] CreateGpkgBlob(byte[] wkb, int srid)
         {
             // Create GeoPackage binary header according to spec
