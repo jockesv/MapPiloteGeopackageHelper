@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 using Microsoft.Data.Sqlite;
-using NetTopologySuite.Geometries;
 
 namespace MapPiloteGeopackageHelper
 {
