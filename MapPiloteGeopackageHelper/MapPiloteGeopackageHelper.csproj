@@ -13,6 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageIcon>MPGeoPackageHelper3.png</PackageIcon>
     <PackageTags>Geopackage</PackageTags>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
