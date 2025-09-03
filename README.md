@@ -2,7 +2,7 @@
 
 Modern .NET library for creating, reading, and bulk-loading GeoPackage (GPKG) data using SQLite and NetTopologySuite.
 
-## ?? Quick Start - Modern Fluent API
+## Quick Start - Modern Fluent API
 
 ```csharp
 // Create/open GeoPackage with fluent API
@@ -40,16 +40,16 @@ var deleted = await layer.DeleteAsync("population < 10000");
 
 | Feature | Description | Example |
 |---------|-------------|---------|
-| **?? Async/Await** | Proper async support with CancellationToken | `await layer.BulkInsertAsync(...)` |
-| **?? Fluent API** | Chain operations naturally | `GeoPackage.OpenAsync().EnsureLayerAsync()` |
-| **?? Progress Reporting** | Track long-running operations | `IProgress<BulkProgress>` |
-| **?? Options Objects** | Clean configuration, no parameter soup | `BulkInsertOptions(BatchSize: 1000)` |
-| **?? Streaming** | `IAsyncEnumerable` for large datasets | `await foreach (var item in ...)` |
-| **?? Rich Queries** | WHERE, LIMIT, ORDER BY support | `ReadOptions(WhereClause: "pop > 1000")` |
-| **??? Conflict Handling** | Insert policies (Abort/Ignore/Replace) | `ConflictPolicy.Ignore` |
-| **??? CRUD Operations** | Count, Delete with conditions | `await layer.DeleteAsync("status = 'old'")` |
+| **Async/Await** | Proper async support with CancellationToken | `await layer.BulkInsertAsync(...)` |
+| **Fluent API** | Chain operations naturally | `GeoPackage.OpenAsync().EnsureLayerAsync()` |
+| **Progress Reporting** | Track long-running operations | `IProgress<BulkProgress>` |
+| **Options Objects** | Clean configuration, no parameter soup | `BulkInsertOptions(BatchSize: 1000)` |
+| **Streaming** | `IAsyncEnumerable` for large datasets | `await foreach (var item in ...)` |
+| **Rich Queries** | WHERE, LIMIT, ORDER BY support | `ReadOptions(WhereClause: "pop > 1000")` |
+| **Conflict Handling** | Insert policies (Abort/Ignore/Replace) | `ConflictPolicy.Ignore` |
+| **CRUD Operations** | Count, Delete with conditions | `await layer.DeleteAsync("status = 'old'")` |
 
-## ?? API Comparison
+## API Comparison
 
 ### Modern API (Recommended)
 ```csharp
@@ -86,7 +86,7 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
   - gpkg_geometry_columns: https://www.geopackage.org/spec/#_geometry_columns
 - **Binary geometry format** - https://www.geopackage.org/spec/#gpb_format
 
-## ??? What This Library Does
+## What This Library Does
 
 ? Creates GeoPackages with required core tables  
 ? Creates layers (tables) with geometry + custom attribute columns  
@@ -95,7 +95,7 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 ? Modern async patterns with cancellation support  
 ? Schema inspection and validation  
 
-## ?? Getting Started
+## Getting Started
 
 1. **Install**: `dotnet add package MapPiloteGeopackageHelper`
 2. **Explore**: Check out `FluentApiExample` project 
