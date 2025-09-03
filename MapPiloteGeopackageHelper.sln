@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperHe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperSchemaBrowser", "MapPiloteGeopackageHelperSchemaBrowser\MapPiloteGeopackageHelperSchemaBrowser.csproj", "{30F69021-96B7-C6CF-CFEB-51C43A9052EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetHelloWorld", "NugetHelloWorld\NugetHelloWorld.csproj", "{1DDF6B83-4FE7-40C2-8384-248131179D91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
