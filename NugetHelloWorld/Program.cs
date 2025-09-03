@@ -33,7 +33,6 @@ using NetTopologySuite.Geometries;         // <- Geometry types (Point etc.) com
 //  3) Insert features (points) with attributes
 //  4) Bulk-insert many features efficiently
 //  5) Read features back from the file
-// Each step is small, explicit and well-commented so you can copy/paste.
 // =============================================================
 
 // 0) Choose a working directory and filenames
