@@ -12,13 +12,13 @@ const int srid = 3006;
 // Clean up
 if (File.Exists(gpkgPath)) File.Delete(gpkgPath);
 
-Console.WriteLine("?? Modern GeoPackage API Demo");
+Console.WriteLine("Modern GeoPackage API Demo");
 Console.WriteLine("===============================\n");
 
 try
 {
     // 1. Create/open GeoPackage
-    Console.WriteLine("?? Creating GeoPackage...");
+    Console.WriteLine("Creating GeoPackage...");
     using var geoPackage = await GeoPackage.OpenAsync(gpkgPath, srid);
     
     // 2. Define schema for different feature types
@@ -31,21 +31,28 @@ try
     };
 
     // 3. Ensure layer exists
-    Console.WriteLine("??? Creating layer 'cities'...");
+    Console.WriteLine("Creating layer 'cities'...");
     var citiesLayer = await geoPackage.EnsureLayerAsync("cities", pointSchema, srid);
 
     // 4. Generate sample data (Swedish cities)
-    Console.WriteLine("??? Generating sample cities...");
+    Console.WriteLine("Generating sample cities...");
     var cities = GenerateSampleCities();
     
     // 5. Bulk insert with progress reporting
-    Console.WriteLine("\n?? Bulk inserting features...");
+    Console.WriteLine("\nBulk inserting features...");
     var progress = new Progress<BulkProgress>(p =>
     {
-        var bar = new string('?', (int)(p.PercentComplete / 5));
-        var empty = new string('?', 20 - bar.Length);
-        Console.Write($"\r[{bar}{empty}] {p.Processed}/{p.Total} ({p.PercentComplete:F1}%) - {p.Remaining} remaining");
-    });
+        var bar = new string('#', (int)(p.PercentComplete / 5));
+        var empty = new string('.', Math.Max(0, 20 - bar.Length));
+        Console.Write($"\r[{bar}{empty}] {p.Processed}/{p.Total} ({p.PercentComplete.ToString("F1", CultureInfo.InvariantCulture)}%) - {p.Remaining} remaining");
+        if (p.Processed >= p.Total)
+        {
+            // Finish the progress line with a newline once complete
+            Console.WriteLine();
+        }
+    }
+    );
+    
 
     await citiesLayer.BulkInsertAsync(
         cities,
@@ -55,11 +62,14 @@ try
             ConflictPolicy: ConflictPolicy.Ignore
         ),
         progress);
+
+    // Ensure we start on a fresh line after progress output
+    Console.WriteLine();
     
-    Console.WriteLine("\n? Insert completed!");
+    Console.WriteLine("Insert completed!");
 
     // 6. Query data back with various options
-    Console.WriteLine("\n?? Querying data back...");
+    Console.WriteLine("\nQuerying data back...");
     
     // Count all features
     var totalCount = await citiesLayer.CountAsync();
@@ -70,7 +80,7 @@ try
     Console.WriteLine($"Large cities (>100k): {largeCities}");
     
     // 7. Stream features with filters
-    Console.WriteLine("\n?? Top 5 largest cities:");
+    Console.WriteLine("\nTop 5 largest cities:");
     var readOptions = new ReadOptions(
         IncludeGeometry: true,
         WhereClause: "population > 50000",
@@ -91,7 +101,7 @@ try
     }
 
     // 8. Demonstrate update/delete operations
-    Console.WriteLine("\n??? Cleaning up small towns...");
+    Console.WriteLine("\nCleaning up small towns...");
     var deleted = await citiesLayer.DeleteAsync("population < 10000");
     Console.WriteLine($"Deleted {deleted} small towns");
 
@@ -99,7 +109,7 @@ try
     Console.WriteLine($"Remaining cities: {remainingCount}");
 
     // 9. Get comprehensive metadata
-    Console.WriteLine("\n?? GeoPackage metadata:");
+    Console.WriteLine("\nGeoPackage metadata:");
     var info = await geoPackage.GetInfoAsync();
     
     foreach (var layer in info.Layers)
@@ -115,12 +125,12 @@ try
         }
     }
 
-    Console.WriteLine($"\n? Demo completed! GeoPackage saved to: {Path.GetFullPath(gpkgPath)}");
+    Console.WriteLine($"\nDemo completed! GeoPackage saved to: {Path.GetFullPath(gpkgPath)}");
     Console.WriteLine("You can open this file in QGIS or other GIS software.");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"? Error: {ex.Message}");
+    Console.WriteLine($"Error: {ex.Message}");
     if (ex.InnerException != null)
     {
         Console.WriteLine($"   Inner: {ex.InnerException.Message}");
