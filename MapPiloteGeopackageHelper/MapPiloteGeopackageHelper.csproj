@@ -12,8 +12,12 @@
     <RepositoryUrl>https://github.com/kartpiloten/MapPiloteGeopackageHelper</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>MPGeoPackageHelper3.png</PackageIcon>
-    <PackageTags>Geopackage</PackageTags>
+    <PackageTags>geopackage;sqlite;gis;geospatial;netTopologySuite;spatial;ogc;vector;features;geometry;point;polygon;linestring;sweref99;epsg;crs;async;fluent-api</PackageTags>
     <Version>1.1.0</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>New Fluent API</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>Licens.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +43,14 @@
 
   <!-- Ensure the icon is packed at the root so it matches PackageIcon -->
   <ItemGroup>
+    <None Include="..\Licens.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="Properties\MPGeoPackageHelper3.png" Pack="True" PackagePath="\" />
   </ItemGroup>
 

@@ -6,7 +6,7 @@ using System.Globalization;
 // Comprehensive Modern Fluent API Example
 // =============================================================
 
-const string gpkgPath = "modern_comprehensive.gpkg";
+const string gpkgPath = "FluentAPIFileExample.gpkg";
 const int srid = 3006;
 
 // Clean up
@@ -102,7 +102,7 @@ try
 
     // 8. Demonstrate update/delete operations
     Console.WriteLine("\nCleaning up small towns...");
-    var deleted = await citiesLayer.DeleteAsync("population < 10000");
+    var deleted = await citiesLayer.DeleteAsync("population < 15000");
     Console.WriteLine($"Deleted {deleted} small towns");
 
     var remainingCount = await citiesLayer.CountAsync();
@@ -141,21 +141,34 @@ static List<FeatureRecord> GenerateSampleCities()
 {
     var cities = new List<(string Name, double X, double Y, int Population, double Area, string Country)>
     {
-        ("Stockholm", 674032, 6580383, 975551, 188.0, "Sweden"),
-        ("Gothenburg", 529268, 6397848, 579281, 203.6, "Sweden"),
-        ("Malmö", 373340, 6161503, 350963, 158.4, "Sweden"),
-        ("Uppsala", 598624, 6654006, 230767, 48.8, "Sweden"),
-        ("Västerås", 565077, 6631421, 127799, 48.2, "Sweden"),
-        ("Örebro", 566848, 6519948, 126009, 58.2, "Sweden"),
-        ("Linköping", 628983, 6484916, 165618, 56.6, "Sweden"),
-        ("Helsingborg", 382988, 6222702, 149280, 38.4, "Sweden"),
-        ("Jönköping", 599133, 6400906, 98659, 38.2, "Sweden"),
-        ("Norrköping", 630483, 6467813, 95618, 45.8, "Sweden"),
-        ("Lund", 375782, 6179652, 94703, 22.6, "Sweden"),
-        ("Umeå", 723932, 7042944, 89607, 33.4, "Sweden"),
-        ("Gävle", 608132, 6828584, 78331, 62.7, "Sweden"),
-        ("Borås", 517298, 6374003, 72169, 40.2, "Sweden"),
-        ("Eskilstuna", 578992, 6558644, 69948, 53.6, "Sweden"),
+        // Major cities
+        ("Stockholm", 683527, 6579433, 975551, 188.0, "Sweden"),
+        ("Gothenburg", 317773, 6394498, 579281, 203.6, "Sweden"),
+        ("Malmö", 375040, 6163000, 350963, 158.4, "Sweden"),
+        ("Uppsala", 646138, 6636722, 230767, 48.8, "Sweden"),
+        ("Västerås", 587902, 6611234, 127799, 48.2, "Sweden"),
+        ("Örebro", 511954, 6569151, 126009, 58.2, "Sweden"),
+        ("Linköping", 537341, 6473261, 165618, 56.6, "Sweden"),
+        ("Helsingborg", 358240, 6212773, 149280, 38.4, "Sweden"),
+        ("Jönköping", 450430, 6400662, 98659, 38.2, "Sweden"),
+        ("Norrköping", 568715, 6494377, 95618, 45.8, "Sweden"),
+        ("Lund", 386905, 6175041, 94703, 22.6, "Sweden"),
+        ("Umeå", 757988, 7088793, 89607, 33.4, "Sweden"),
+        ("Gävle", 616308, 6729788, 78331, 62.7, "Sweden"),
+        ("Borås", 377137, 6400313, 72169, 40.2, "Sweden"),
+        ("Eskilstuna", 584568, 6580834, 69948, 53.6, "Sweden"),
+        
+        // Smaller towns and villages to demonstrate deletion
+        ("Mariefred", 626618, 6571605, 3783, 12.4, "Sweden"),
+        ("Trosa", 646980, 6531411, 5192, 18.7, "Sweden"),
+        ("Vaxholm", 689191, 6590230, 4312, 8.9, "Sweden"),
+        ("Sigtuna", 652732, 6612047, 8444, 21.3, "Sweden"),
+        ("Åmål", 367901, 6548074, 9380, 15.6, "Sweden"),
+        ("Lysekil", 292103, 6465552, 7568, 19.2, "Sweden"),
+        ("Marstrand", 297277, 6421146, 1432, 7.4, "Sweden"),
+        ("Strömstad", 280575, 6540319, 6288, 11.8, "Sweden"),
+        ("Ystad", 425090, 6144121, 18350, 9.9, "Sweden"),
+        ("Simrishamn", 458718, 6156142, 6327, 22.1, "Sweden")
     };
 
     return cities.Select(city => new FeatureRecord(
