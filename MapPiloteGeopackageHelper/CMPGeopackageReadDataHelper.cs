@@ -195,7 +195,7 @@ namespace MapPiloteGeopackageHelper
         }
 
         // Helper: strips the GeoPackage geometry header and returns WKB payload
-        internal static byte[] StripGpkgHeader(byte[] gpkgBinary)
+        public static byte[] StripGpkgHeader(byte[] gpkgBinary)
         {
             if (gpkgBinary.Length < 8)
                 throw new ArgumentException("Invalid GPKG geometry header");
@@ -218,6 +218,87 @@ namespace MapPiloteGeopackageHelper
             var wkb = new byte[gpkgBinary.Length - headerSize];
             Array.Copy(gpkgBinary, headerSize, wkb, 0, wkb.Length);
             return wkb;
+        }
+
+        /// <summary>
+        /// Reads a NetTopologySuite Geometry directly from GeoPackage binary data
+        /// </summary>
+        /// <param name="gpkgBinary">Raw GeoPackage geometry blob from database</param>
+        /// <returns>Parsed geometry object or null if parsing fails</returns>
+        public static Geometry? ReadGeometryFromGpkgBlob(byte[] gpkgBinary)
+        {
+            try
+            {
+                var wkb = StripGpkgHeader(gpkgBinary);
+                var reader = new WKBReader();
+                return reader.Read(wkb);
+            }
+            catch
+            {
+                return null; // Return null for invalid geometry data
+            }
+        }
+
+        /// <summary>
+        /// Executes a spatial query and returns features with geometries automatically parsed
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path to GeoPackage file</param>
+        /// <param name="tableName">Table name to query</param>
+        /// <param name="whereClause">Optional WHERE clause (without WHERE keyword)</param>
+        /// <param name="geometryColumn">Geometry column name (default: "geom")</param>
+        /// <returns>Features with parsed geometries</returns>
+        public static IEnumerable<FeatureRecord> ExecuteSpatialQuery(
+            string geoPackageFilePath,
+            string tableName,
+            string? whereClause = null,
+            string geometryColumn = "geom")
+        {
+            using var connection = new SqliteConnection($"Data Source={geoPackageFilePath}");
+            connection.Open();
+
+            var sql = $"SELECT * FROM {tableName}";
+            if (!string.IsNullOrEmpty(whereClause))
+                sql += $" WHERE {whereClause}";
+
+            using var command = new SqliteCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+
+            // Get column info
+            var columnNames = new List<string>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columnNames.Add(reader.GetName(i));
+            }
+
+            var attributeColumns = columnNames
+                .Where(name => !name.Equals("id", StringComparison.OrdinalIgnoreCase) 
+                            && !name.Equals(geometryColumn, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            int geomOrdinal = -1;
+            try { geomOrdinal = reader.GetOrdinal(geometryColumn); } catch { }
+
+            while (reader.Read())
+            {
+                // Build attributes
+                var attributes = new Dictionary<string, string?>(StringComparer.Ordinal);
+                foreach (var colName in attributeColumns)
+                {
+                    var ord = reader.GetOrdinal(colName);
+                    attributes[colName] = reader.IsDBNull(ord) ? null : 
+                        Convert.ToString(reader.GetValue(ord), CultureInfo.InvariantCulture);
+                }
+
+                // Parse geometry automatically
+                Geometry? geometry = null;
+                if (geomOrdinal >= 0 && !reader.IsDBNull(geomOrdinal))
+                {
+                    var gpkgBlob = (byte[])reader.GetValue(geomOrdinal);
+                    geometry = ReadGeometryFromGpkgBlob(gpkgBlob); // ← Library handles the details!
+                }
+
+                yield return new FeatureRecord(geometry, attributes);
+            }
         }
 
         /*

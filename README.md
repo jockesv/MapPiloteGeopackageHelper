@@ -36,7 +36,7 @@ var count = await layer.CountAsync("population < 50000");
 var deleted = await layer.DeleteAsync("population < 10000");
 ```
 
-## ? Modern Features
+## Modern Features
 
 | Feature | Description | Example |
 |---------|-------------|---------|
@@ -67,7 +67,7 @@ GeopackageLayerCreateHelper.CreateGeopackageLayer(path, name, schema);
 CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 ```
 
-## ?? Sample Projects
+## Sample Projects
 
 | Project | Purpose | API Style |
 |---------|---------|-----------|
@@ -76,7 +76,7 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 | **MapPiloteGeopackageHelperSchemaBrowser** | Inspect unknown GeoPackages | ?? Analysis |
 | **BulkLoadPerformaceTester** | Performance comparison | ? Benchmarks |
 
-## ?? Reference Links (GeoPackage Specification)
+## Reference Links (GeoPackage Specification)
 
 - **GeoPackage Encoding Standard** - https://www.geopackage.org/spec/
 - **OGC Standard page** - https://www.ogc.org/standard/geopackage/
@@ -88,12 +88,12 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 
 ## What This Library Does
 
-? Creates GeoPackages with required core tables  
-? Creates layers (tables) with geometry + custom attribute columns  
-? Bulk writes features with validation and progress tracking  
-? Streams features back with filtering and paging  
-? Modern async patterns with cancellation support  
-? Schema inspection and validation  
+* Creates GeoPackages with required core tables  
+* Creates layers (tables) with geometry + custom attribute columns  
+* Bulk writes features with validation and progress tracking  
+* Streams features back with filtering and paging  
+* Modern async patterns with cancellation support  
+* Schema inspection and validation  
 
 ## Getting Started
 
