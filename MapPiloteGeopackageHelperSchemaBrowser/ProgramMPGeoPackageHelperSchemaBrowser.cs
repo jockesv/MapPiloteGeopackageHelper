@@ -24,11 +24,20 @@
 using MapPiloteGeopackageHelper;
 using System.Globalization;
 
-// Simple console schema-and-sample browser for GeoPackage files.
-// - Prints layers, columns, SRIDs, extents.
-// - Emits a C# record model per layer and sample reader code the user can copy.
+// =============================================================
+// GeoPackage Schema Browser for MapPiloteGeopackageHelper
+// -------------------------------------------------------------
+// This example demonstrates how to:
+//  1) Open existing GeoPackage files
+//  2) Inspect available layers and their schemas
+//  3) Browse spatial reference systems (SRS)
+//  4) Examine column definitions and constraints
+//  5) Display comprehensive metadata information
+// Perfect for exploring unknown GeoPackage files!
+// =============================================================
 
-string gpkg = @"Z:\Projekt 2025\Utredning_serviceplatser\BatchMunicipalities\Municipality.gpkg";
+string workDir = Environment.CurrentDirectory;
+string gpkg = Path.Combine(workDir, "Data", "AdmBordersSweden.gpkg");
 
 Console.WriteLine(gpkg);
 

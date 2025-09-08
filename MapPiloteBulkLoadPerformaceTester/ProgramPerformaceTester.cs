@@ -26,6 +26,18 @@ using NetTopologySuite.Geometries;
 using System.Diagnostics;
 using System.Globalization;
 
+// =============================================================
+// Bulk Load Performance Tester for MapPiloteGeopackageHelper
+// -------------------------------------------------------------
+// This performance comparison example demonstrates:
+//  1) Single-row insert approach (traditional, slower)
+//  2) Bulk insert approach (modern, faster)
+//  3) Performance metrics and timing comparisons
+//  4) File size analysis between methods
+//  5) Configurable test dataset generation
+// Perfect for benchmarking different insertion strategies!
+// =============================================================
+
 // Performance comparison between single inserts and bulk insert
 
 const int srid = 3006;

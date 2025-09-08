@@ -8,14 +8,13 @@
     <LangVersion>13.0</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Conditional Reference: Use project reference when developing, NuGet when distributed -->
+  <ItemGroup Condition="'$(UseLocalProjects)' == 'true'">
     <ProjectReference Include="..\MapPiloteGeopackageHelper\MapPiloteGeopackageHelper.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="data\sverige.gpkg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+  
+  <ItemGroup Condition="'$(UseLocalProjects)' != 'true'">
+    <PackageReference Include="MapPiloteGeopackageHelper" Version="$(MapPiloteGeopackageHelperVersion)" />
   </ItemGroup>
 
 </Project>

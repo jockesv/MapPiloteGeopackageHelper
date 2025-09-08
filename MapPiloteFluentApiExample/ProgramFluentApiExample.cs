@@ -1,9 +1,42 @@
+/* Licence...
+ * MIT License
+ *
+ * Copyright (c) 2025 Anders Dahlgren
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights 
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is 
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all 
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * SOFTWARE.
+ */
 using MapPiloteGeopackageHelper;
 using NetTopologySuite.Geometries;
 using System.Globalization;
 
 // =============================================================
-// Comprehensive Modern Fluent API Example
+// Modern Fluent API Example for MapPiloteGeopackageHelper
+// -------------------------------------------------------------
+// This comprehensive example demonstrates the modern API:
+//  1) Create/open GeoPackage with fluent syntax
+//  2) Define schemas and ensure layers exist
+//  3) Generate sample Swedish cities data
+//  4) Bulk insert with progress reporting and options
+//  5) Query data with filtering, sorting and streaming
+//  6) Demonstrate CRUD operations (Create, Read, Update, Delete)
+//  7) Extract comprehensive metadata and statistics
+// Perfect for learning the recommended async/await patterns!
 // =============================================================
 
 const string gpkgPath = "FluentAPIFileExample.gpkg";

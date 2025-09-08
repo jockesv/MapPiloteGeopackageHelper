@@ -2,13 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Conditional Reference: Use project reference when developing, NuGet when distributed -->
+  <ItemGroup Condition="'$(UseLocalProjects)' == 'true'">
     <ProjectReference Include="..\MapPiloteGeopackageHelper\MapPiloteGeopackageHelper.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(UseLocalProjects)' != 'true'">
+    <PackageReference Include="MapPiloteGeopackageHelper" Version="$(MapPiloteGeopackageHelperVersion)" />
   </ItemGroup>
 
 </Project>
