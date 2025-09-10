@@ -106,7 +106,7 @@ namespace MapPiloteGeopackageHelper
                     command.ExecuteNonQuery();
                 }
 
-                Console.WriteLine($"Successfully added point to layer '{layerName}' in GeoPackage");
+                //Console.WriteLine($"Successfully added point to layer '{layerName}' in GeoPackage");
             }
         }
 

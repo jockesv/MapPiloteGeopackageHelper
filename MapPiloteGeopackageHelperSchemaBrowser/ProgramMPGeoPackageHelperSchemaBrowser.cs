@@ -1,4 +1,4 @@
-/* Licence...
+﻿/* Licence...
  * MIT License
  *
  * Copyright (c) 2025 Anders Dahlgren
@@ -38,6 +38,144 @@ using System.Globalization;
 
 string workDir = Environment.CurrentDirectory;
 string gpkg = Path.Combine(workDir, "Data", "AdmBordersSweden.gpkg");
+
+Console.WriteLine("=== MapPilote GeoPackage Schema Browser ===");
+
+// Show reference mode at runtime - check the LIBRARY we're testing, not this project
+#if DEBUG
+var helperAssembly = typeof(CMPGeopackageCreateHelper).Assembly;
+var assemblyLocation = helperAssembly.Location;
+var assemblyDirectory = Path.GetDirectoryName(assemblyLocation) ?? "";
+
+Console.WriteLine($"Checking MapPiloteGeopackageHelper library location...");
+Console.WriteLine($"   Assembly: {helperAssembly.FullName}");
+Console.WriteLine($"   Location: {assemblyLocation}");
+
+// Check if we're in a local development environment but using copied assemblies
+var isInTestProjectBin = assemblyLocation.Contains("\\bin\\Debug\\") || 
+                         assemblyLocation.Contains("/bin/Debug/") ||
+                         assemblyLocation.Contains("\\bin\\Release\\") || 
+                         assemblyLocation.Contains("/bin/Release/");
+
+// Read the MSBuild UseLocalProjects setting from the project
+var projectDir = Path.GetDirectoryName(Environment.CurrentDirectory) ?? "";
+var useLocalProjectsFromBuild = Environment.GetEnvironmentVariable("UseLocalProjects");
+var assemblySize = new FileInfo(assemblyLocation).Length;
+
+// Better detection logic - check multiple indicators
+var isFromNuGet = false;
+var nuGetIndicators = new List<string>();
+
+// Check 1: Direct NuGet cache path
+if (assemblyLocation.Contains("\\.nuget\\packages\\") || 
+    assemblyLocation.Contains("/.nuget/packages/") ||
+    assemblyLocation.Contains("\\packages\\mappilotegeopackagehelper\\") ||
+    assemblyLocation.Contains("/packages/mappilotegeopackagehelper/"))
+{
+    isFromNuGet = true;
+    nuGetIndicators.Add("Direct NuGet cache path");
+}
+
+// Check 2: Look for NuGet restore files in obj folder
+var objFolder = Path.Combine(Environment.CurrentDirectory, "obj");
+if (Directory.Exists(objFolder))
+{
+    var nugetRestoreFiles = Directory.GetFiles(objFolder, "*.nuget.*", SearchOption.AllDirectories);
+    if (nugetRestoreFiles.Length > 0)
+    {
+        nuGetIndicators.Add($"NuGet restore files in obj ({nugetRestoreFiles.Length} files)");
+        
+        // Check if any restore file mentions our package
+        foreach (var file in nugetRestoreFiles.Take(5)) // Check first 5 files
+        {
+            try
+            {
+                var content = File.ReadAllText(file);
+                if (content.Contains("MapPiloteGeopackageHelper", StringComparison.OrdinalIgnoreCase))
+                {
+                    isFromNuGet = true;
+                    nuGetIndicators.Add($"Package found in {Path.GetFileName(file)}");
+                    break;
+                }
+            }
+            catch { /* ignore file read errors */ }
+        }
+    }
+}
+
+// Check 3: Look for .deps.json file which indicates NuGet resolution
+var depsJsonPath = Path.Combine(Path.GetDirectoryName(assemblyLocation) ?? "", 
+                                Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "") + ".deps.json");
+if (File.Exists(depsJsonPath))
+{
+    try
+    {
+        var depsContent = File.ReadAllText(depsJsonPath);
+        if (depsContent.Contains("MapPiloteGeopackageHelper", StringComparison.OrdinalIgnoreCase))
+        {
+            nuGetIndicators.Add("Found in .deps.json (NuGet dependency)");
+            if (depsContent.Contains("\"type\": \"package\""))
+            {
+                isFromNuGet = true;
+                nuGetIndicators.Add("Confirmed as package dependency in .deps.json");
+            }
+        }
+    }
+    catch { /* ignore file read errors */ }
+}
+
+Console.WriteLine($"   MSBuild UseLocalProjects: {useLocalProjectsFromBuild ?? "not set in environment"}");
+Console.WriteLine($"   NuGet Detection Indicators: {string.Join(", ", nuGetIndicators)}");
+
+if (isFromNuGet)
+{
+    Console.WriteLine("LIBRARY MODE: Using NUGET MapPiloteGeopackageHelper package");  
+    Console.WriteLine("   Testing against published NuGet package from nuget.org");
+}
+else if (isInTestProjectBin)
+{
+    // When in test project bin, we need to check the build configuration
+    // If UseLocalProjects=false in Directory.Build.props, it's likely NuGet even if copied
+    var directoryBuildProps = Path.Combine(projectDir, "Directory.Build.props");
+    bool useLocalFromProps = true; // default assumption
+    
+    if (File.Exists(directoryBuildProps))
+    {
+        var propsContent = File.ReadAllText(directoryBuildProps);
+        if (propsContent.Contains("<UseLocalProjects") && propsContent.Contains(">false<"))
+        {
+            useLocalFromProps = false;
+        }
+    }
+    
+    if (!useLocalFromProps)
+    {
+        Console.WriteLine("LIBRARY MODE: Using NUGET MapPiloteGeopackageHelper package");  
+        Console.WriteLine("   Testing against published NuGet package (copied to bin folder)");
+        Console.WriteLine("   Assembly copied from NuGet cache to local bin during build");
+    }
+    else
+    {
+        Console.WriteLine("LIBRARY MODE: Using LOCAL MapPiloteGeopackageHelper");
+        Console.WriteLine("   Testing against your development code");
+    }
+}
+else
+{
+    Console.WriteLine("LIBRARY MODE: UNKNOWN - Please check manually");
+    Console.WriteLine($"   Location: {assemblyLocation}");
+}
+
+// Show additional diagnostic info
+Console.WriteLine($"   Diagnostic info:");
+Console.WriteLine($"   - Is in NuGet cache: {isFromNuGet}");
+Console.WriteLine($"   - Is in bin folder: {isInTestProjectBin}");
+Console.WriteLine($"   - Assembly file size: {assemblySize / 1024.0:F1} KB");
+Console.WriteLine();
+#else
+Console.WriteLine("LIBRARY MODE: Using NUGET MapPiloteGeopackageHelper package (Release build)");
+Console.WriteLine();
+#endif
 
 Console.WriteLine(gpkg);
 

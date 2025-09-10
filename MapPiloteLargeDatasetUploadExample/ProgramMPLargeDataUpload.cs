@@ -25,6 +25,7 @@ using MapPiloteGeopackageHelper;
 using NetTopologySuite.Geometries;
 using System.Diagnostics;
 using Microsoft.Data.Sqlite;
+using NetTopologySuite.IO;
 
 // =============================================================
 // Large Dataset Upload Example with Spatial Index Performance Test
@@ -146,7 +147,7 @@ static async Task<List<FeatureRecord>> GenerateRandomAirPollutionDataAsync(int c
     
     // Read the Swedish boundary geometry
     Geometry? swedenGeometry = null;
-    var swedenFeatures = CMPGeopackageReadDataHelper.ExecuteSpatialQuery(sverigeGpkgPath, GetFirstTableName(sverigeGpkgPath));
+    var swedenFeatures = CMPGeopackageReadDataHelper.ReadFeatures(sverigeGpkgPath, GetFirstTableName(sverigeGpkgPath));
     swedenGeometry = swedenFeatures.FirstOrDefault()?.Geometry;
     
     if (swedenGeometry == null)
@@ -159,7 +160,7 @@ static async Task<List<FeatureRecord>> GenerateRandomAirPollutionDataAsync(int c
     // Get the envelope for initial random point generation
     var envelope = swedenGeometry.EnvelopeInternal;
     Console.WriteLine($"   Generating {count:N0} points within Swedish territory...");
-    Console.WriteLine($"   ⚡ Using optimized two-stage filtering for faster generation...");
+    Console.WriteLine($"     Using optimized two-stage filtering for faster generation...");
     
     var cities = new[] { "Stockholm", "Göteborg", "Malmö", "Uppsala", "Västerås", "Örebro", "Linköping", "Helsingborg", "Jönköping", "Norrköping" };
     
@@ -323,7 +324,7 @@ static async Task CreateGeoPackageSpatialIndexAsync(SqliteConnection connection,
         
         var selectSql = $"SELECT rowid, geom FROM {layerName} WHERE geom IS NOT NULL";
         using var selectCmd = new SqliteCommand(selectSql, connection);
-        using var reader = await selectCmd.ExecuteReaderAsync();
+        using var dataReader = await selectCmd.ExecuteReaderAsync();
         
         var insertSql = $"INSERT INTO rtree_{layerName}_geom (id, minx, maxx, miny, maxy) VALUES (@id, @minx, @maxx, @miny, @maxy)";
         using var insertCmd = new SqliteCommand(insertSql, connection);
@@ -337,16 +338,34 @@ static async Task CreateGeoPackageSpatialIndexAsync(SqliteConnection connection,
         int indexedCount = 0;
         int processedCount = 0;
         var progressStopwatch = Stopwatch.StartNew();
+        var wkbReader = new WKBReader();
         
-        while (await reader.ReadAsync())
+        while (await dataReader.ReadAsync())
         {
             processedCount++;
-            var rowid = reader.GetInt32(0);
-            var gpkgBlob = (byte[])reader.GetValue(1);
+            var rowid = dataReader.GetInt32(0);
+            var gpkgBlob = (byte[])dataReader.GetValue(1);
             
             try
             {
-                var geometry = CMPGeopackageReadDataHelper.ReadGeometryFromGpkgBlob(gpkgBlob);
+                Geometry? geometry = null;
+                try
+                {
+                    // Skip the GeoPackage header and read the WKB part
+                    if (gpkgBlob.Length > 8) // GeoPackage header is at least 8 bytes
+                    {
+                        // Find WKB start - typically after the header
+                        var wkbStart = 8; // Standard GeoPackage header size
+                        var wkbData = new byte[gpkgBlob.Length - wkbStart];
+                        Array.Copy(gpkgBlob, wkbStart, wkbData, 0, wkbData.Length);
+                        geometry = wkbReader.Read(wkbData);
+                    }
+                }
+                catch
+                {
+                    // Skip invalid geometries
+                }
+                
                 if (geometry != null)
                 {
                     var env = geometry.EnvelopeInternal;
@@ -460,23 +479,40 @@ static async Task<(int Count, long QueryTime)> QueryPointsInBufferAsync(string g
     }
     
     using var command = new SqliteCommand(sql, connection);
-    using var reader = await command.ExecuteReaderAsync();
+    using var queryReader = await command.ExecuteReaderAsync();
     
     int candidateCount = 0;
     int actualCount = 0;
     int geometryParseErrors = 0;
     var sampleDistances = new List<double>();
+    var wkbReader = new WKBReader();
     
-    while (await reader.ReadAsync())
+    while (await queryReader.ReadAsync())
     {
         candidateCount++;
         
-        if (!reader.IsDBNull(3)) // geom column
+        if (!queryReader.IsDBNull(3)) // geom column
         {
-            var gpkgBlob = (byte[])reader.GetValue(3);
+            var gpkgBlob = (byte[])queryReader.GetValue(3);
             try
             {
-                var geometry = CMPGeopackageReadDataHelper.ReadGeometryFromGpkgBlob(gpkgBlob);
+                Geometry? geometry = null;
+                try
+                {
+                    // Skip the GeoPackage header and read the WKB part
+                    if (gpkgBlob.Length > 8) // GeoPackage header is at least 8 bytes
+                    {
+                        // Find WKB start - typically after the header
+                        var wkbStart = 8; // Standard GeoPackage header size
+                        var wkbData = new byte[gpkgBlob.Length - wkbStart];
+                        Array.Copy(gpkgBlob, wkbStart, wkbData, 0, wkbData.Length);
+                        geometry = wkbReader.Read(wkbData);
+                    }
+                }
+                catch
+                {
+                    // Skip invalid geometries
+                }
                 
                 if (geometry != null)
                 {
@@ -491,9 +527,9 @@ static async Task<(int Count, long QueryTime)> QueryPointsInBufferAsync(string g
                     {
                         var attributes = new Dictionary<string, string?>(StringComparer.Ordinal)
                         {
-                            ["rowid"] = reader.GetInt32(0).ToString(),
-                            ["name"] = reader.GetString(1),
-                            ["airpolutionLevel"] = reader.GetInt32(2).ToString()
+                            ["rowid"] = queryReader.GetInt32(0).ToString(),
+                            ["name"] = queryReader.GetString(1),
+                            ["airpolutionLevel"] = queryReader.GetInt32(2).ToString()
                         };
                         
                         results.Add(new FeatureRecord(geometry, attributes));

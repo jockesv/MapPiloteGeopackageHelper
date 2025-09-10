@@ -71,10 +71,10 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 
 | Project | Purpose | API Style |
 |---------|---------|-----------|
-| **FluentApiExample** | Comprehensive modern API demo | ?? Modern |
-| **MapPiloteGeopackageHelperHelloWorld** | Step-by-step tutorial | ?? Traditional |
-| **MapPiloteGeopackageHelperSchemaBrowser** | Inspect unknown GeoPackages | ?? Analysis |
-| **BulkLoadPerformaceTester** | Performance comparison | ? Benchmarks |
+| **FluentApiExample** | Comprehensive modern API demo | Modern |
+| **MapPiloteGeopackageHelperHelloWorld** | Step-by-step tutorial | Traditional |
+| **MapPiloteGeopackageHelperSchemaBrowser** | Inspect unknown GeoPackages | Analysis |
+| **BulkLoadPerformaceTester** | Performance comparison | Benchmarks |
 
 ## Reference Links (GeoPackage Specification)
 

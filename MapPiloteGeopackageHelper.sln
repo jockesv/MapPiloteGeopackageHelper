@@ -13,22 +13,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperHe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperSchemaBrowser", "MapPiloteGeopackageHelperSchemaBrowser\MapPiloteGeopackageHelperSchemaBrowser.csproj", "{30F69021-96B7-C6CF-CFEB-51C43A9052EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteNugetHelloWorld", "MapPiloteNugetHelloWorld\MapPiloteNugetHelloWorld.csproj", "{1DDF6B83-4FE7-40C2-8384-248131179D91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteHelloWorld2", "MapPiloteNugetHelloWorld\MapPiloteHelloWorld2.csproj", "{1DDF6B83-4FE7-40C2-8384-248131179D91}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteFluentApiExample", "MapPiloteFluentApiExample\MapPiloteFluentApiExample.csproj", "{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		README.md = README.md
 		Licens.txt = Licens.txt
-		REFERENCE_MODE.md = REFERENCE_MODE.md
-		switch-to-local.bat = switch-to-local.bat
-		switch-to-nuget.bat = switch-to-nuget.bat
-		SwitchReferences.ps1 = SwitchReferences.ps1
+		README.md = README.md
+		SolutionNotesAndTodos.txt = SolutionNotesAndTodos.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteNugetLargeDatasetUploadExample", "MapPiloteLargeDatasetUploadExample\MapPiloteNugetLargeDatasetUploadExample.csproj", "{BB47C08D-0318-42FD-ABA0-5039298FC41D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteLargeDatasetUploadExample", "MapPiloteLargeDatasetUploadExample\MapPiloteLargeDatasetUploadExample.csproj", "{BB47C08D-0318-42FD-ABA0-5039298FC41D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

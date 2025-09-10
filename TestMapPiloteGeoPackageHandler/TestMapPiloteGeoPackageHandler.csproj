@@ -14,13 +14,8 @@
     <PackageReference Include="MSTest" Version="3.6.4" />
   </ItemGroup>
 
-  <!-- Conditional Reference: Use project reference when developing, NuGet when distributed -->
-  <ItemGroup Condition="'$(UseLocalProjects)' == 'true'">
+  <ItemGroup>
     <ProjectReference Include="..\MapPiloteGeopackageHelper\MapPiloteGeopackageHelper.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(UseLocalProjects)' != 'true'">
-    <PackageReference Include="MapPiloteGeopackageHelper" Version="$(MapPiloteGeopackageHelperVersion)" />
   </ItemGroup>
 
   <ItemGroup>

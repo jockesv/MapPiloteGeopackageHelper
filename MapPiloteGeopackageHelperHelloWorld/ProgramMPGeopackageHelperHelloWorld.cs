@@ -24,6 +24,10 @@
 using MapPiloteGeopackageHelper;           // <- This is the library namespace (our API lives here)
 using NetTopologySuite.Geometries;         // <- Geometry types (Point etc.) come from NetTopologySuite
 
+Console.WriteLine("=== MapPilote GeoPackage Helper Hello World ===");
+Console.WriteLine("Using local MapPiloteGeopackageHelper library");
+Console.WriteLine();
+
 // =============================================================
 // Hello World for MapPiloteGeopackageHelper
 // -------------------------------------------------------------

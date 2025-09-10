@@ -4,13 +4,14 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <!-- Conditional Reference: Use project reference when developing, NuGet when distributed -->
-  <ItemGroup Condition="'$(UseLocalProjects)' == 'true'">
+  <ItemGroup>
     <ProjectReference Include="..\MapPiloteGeopackageHelper\MapPiloteGeopackageHelper.csproj" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(UseLocalProjects)' != 'true'">
-    <PackageReference Include="MapPiloteGeopackageHelper" Version="$(MapPiloteGeopackageHelperVersion)" />
+  <ItemGroup>
+    <None Update="Data\AdmBordersSweden.gpkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

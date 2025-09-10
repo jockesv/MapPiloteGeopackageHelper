@@ -1,29 +1,10 @@
-<!-- Directory.Build.props - Controls whether to use local projects or NuGet packages -->
+<!-- Directory.Build.props - Simplified to use only local project references -->
 <Project>
-  <PropertyGroup>
-    <!-- Set this to 'true' to use local project references for debugging -->
-    <!-- Set this to 'false' to use NuGet package references -->
-    <UseLocalProjects Condition="'$(UseLocalProjects)' == ''">true</UseLocalProjects>
-    
-    <!-- Version to use when referencing NuGet package -->
-    <MapPiloteGeopackageHelperVersion Condition="'$(MapPiloteGeopackageHelperVersion)' == ''">1.1.1</MapPiloteGeopackageHelperVersion>
-  </PropertyGroup>
-
   <!-- Global properties for all projects -->
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>13.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <!-- Define which projects should use conditional references -->
-  <PropertyGroup>
-    <IsTestOrExampleProject Condition="$(MSBuildProjectName.Contains('Test')) OR 
-                                      $(MSBuildProjectName.Contains('Example')) OR 
-                                      $(MSBuildProjectName.Contains('HelloWorld')) OR 
-                                      $(MSBuildProjectName.Contains('Browser')) OR 
-                                      $(MSBuildProjectName.Contains('Tester')) OR 
-                                      $(MSBuildProjectName.Contains('Nuget'))">true</IsTestOrExampleProject>
   </PropertyGroup>
 </Project>
