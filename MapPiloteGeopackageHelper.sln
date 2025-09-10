@@ -7,25 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelper",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMapPiloteGeoPackageHandler", "TestMapPiloteGeoPackageHandler\TestMapPiloteGeoPackageHandler.csproj", "{0ABBA333-C424-486A-9B87-3A42BBF6F09D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteBulkLoadPerformaceTester", "MapPiloteBulkLoadPerformaceTester\MapPiloteBulkLoadPerformaceTester.csproj", "{3E6692C1-47A6-4294-9B4E-AC5DB733C0F7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperHelloWorld", "MapPiloteGeopackageHelperHelloWorld\MapPiloteGeopackageHelperHelloWorld.csproj", "{5335D80F-471E-4A48-BED3-E163F949F35E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteGeopackageHelperSchemaBrowser", "MapPiloteGeopackageHelperSchemaBrowser\MapPiloteGeopackageHelperSchemaBrowser.csproj", "{30F69021-96B7-C6CF-CFEB-51C43A9052EC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteHelloWorld2", "MapPiloteNugetHelloWorld\MapPiloteHelloWorld2.csproj", "{1DDF6B83-4FE7-40C2-8384-248131179D91}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteFluentApiExample", "MapPiloteFluentApiExample\MapPiloteFluentApiExample.csproj", "{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
 		Licens.txt = Licens.txt
 		README.md = README.md
 		SolutionNotesAndTodos.txt = SolutionNotesAndTodos.txt
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapPiloteLargeDatasetUploadExample", "MapPiloteLargeDatasetUploadExample\MapPiloteLargeDatasetUploadExample.csproj", "{BB47C08D-0318-42FD-ABA0-5039298FC41D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,30 +28,6 @@ Global
 		{0ABBA333-C424-486A-9B87-3A42BBF6F09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ABBA333-C424-486A-9B87-3A42BBF6F09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ABBA333-C424-486A-9B87-3A42BBF6F09D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E6692C1-47A6-4294-9B4E-AC5DB733C0F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E6692C1-47A6-4294-9B4E-AC5DB733C0F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E6692C1-47A6-4294-9B4E-AC5DB733C0F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E6692C1-47A6-4294-9B4E-AC5DB733C0F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5335D80F-471E-4A48-BED3-E163F949F35E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5335D80F-471E-4A48-BED3-E163F949F35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5335D80F-471E-4A48-BED3-E163F949F35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5335D80F-471E-4A48-BED3-E163F949F35E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30F69021-96B7-C6CF-CFEB-51C43A9052EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DDF6B83-4FE7-40C2-8384-248131179D91}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF9258D8-C6E8-3B60-56A6-71DDBA3690DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB47C08D-0318-42FD-ABA0-5039298FC41D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB47C08D-0318-42FD-ABA0-5039298FC41D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB47C08D-0318-42FD-ABA0-5039298FC41D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB47C08D-0318-42FD-ABA0-5039298FC41D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
