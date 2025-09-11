@@ -35,7 +35,16 @@ namespace MapPiloteGeopackageHelper
         /// <param name="tableHeaders">Dictionary of column names and their SQL types (including spatial column)</param>
         /// <param name="geometryType">Type of geometry (default: GEOMETRY for flexible type)</param>
         /// <param name="srid">Spatial Reference System Identifier (default: 3006 for SWEREF99 TM)</param>
-        public static void CreateGeopackageLayer(string geoPackageFilePath, string layerName, Dictionary<string, string> tableHeaders, string geometryType = "GEOMETRY", int srid = 3006)
+        /// <param name="onStatus">Optional callback for status messages</param>
+        /// <param name="onError">Optional callback for error messages</param>
+        public static void CreateGeopackageLayer(
+            string geoPackageFilePath, 
+            string layerName, 
+            Dictionary<string, string> tableHeaders, 
+            string geometryType = "GEOMETRY", 
+            int srid = 3006,
+            Action<string>? onStatus = null,
+            Action<string>? onError = null)
         {
             try
             {
@@ -80,12 +89,13 @@ namespace MapPiloteGeopackageHelper
                     // Register geometry column in gpkg_geometry_columns
                     CMPGeopackageUtils.RegisterGeometryColumn(connection, layerName, geometryColumn, geometryType, srid);
 
-                    Console.WriteLine($"Successfully created spatial layer '{layerName}' in GeoPackage");
+                    onStatus?.Invoke($"Successfully created spatial layer '{layerName}' in GeoPackage");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating GeoPackage layer: {ex.Message}");
+                var errorMessage = $"Error creating GeoPackage layer: {ex.Message}";
+                onError?.Invoke(errorMessage);
                 throw;
             }
         }

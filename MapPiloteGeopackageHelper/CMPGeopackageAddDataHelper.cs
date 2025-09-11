@@ -47,7 +47,8 @@ namespace MapPiloteGeopackageHelper
         /// <param name="layerName">Name of the layer to add the point to</param>
         /// <param name="point">Point geometry to add</param>
         /// <param name="attributeData">Array of attribute values corresponding to the non-geometry columns</param>
-        public static void AddPointToGeoPackage(string geoPackagePath, string layerName, Point point, string[] attributeData)
+        /// <param name="onWarning">Optional callback for warning messages</param>
+        public static void AddPointToGeoPackage(string geoPackagePath, string layerName, Point point, string[] attributeData, Action<string>? onWarning = null)
         {
             // Ensure the GeoPackage file exists
             if (!File.Exists(geoPackagePath))
@@ -78,7 +79,7 @@ namespace MapPiloteGeopackageHelper
                 // Enhanced validation: Check data type compatibility
                 for (int i = 0; i < attributeData.Length; i++)
                 {
-                    ValidateDataTypeCompatibility(columnInfo[i], attributeData[i], i);
+                    ValidateDataTypeCompatibility(columnInfo[i], attributeData[i], i, onWarning);
                 }
 
                 // Build the INSERT statement
@@ -105,8 +106,6 @@ namespace MapPiloteGeopackageHelper
 
                     command.ExecuteNonQuery();
                 }
-
-                //Console.WriteLine($"Successfully added point to layer '{layerName}' in GeoPackage");
             }
         }
 
@@ -119,7 +118,8 @@ namespace MapPiloteGeopackageHelper
             IEnumerable<FeatureRecord> features,
             int srid = 3006,
             int batchSize = 1000,
-            string geometryColumn = "geom")
+            string geometryColumn = "geom",
+            Action<string>? onWarning = null)
         {
             if (!File.Exists(geoPackagePath))
                 throw new FileNotFoundException($"GeoPackage file not found: {geoPackagePath}");
@@ -157,7 +157,7 @@ namespace MapPiloteGeopackageHelper
                     var col = columnInfo[idx];
                     feature.Attributes.TryGetValue(col.Name, out var raw);
                     var valForValidation = raw ?? string.Empty;
-                    ValidateDataTypeCompatibility(col, valForValidation, idx);
+                    ValidateDataTypeCompatibility(col, valForValidation, idx, onWarning);
 
                     var converted = ConvertValueToSqliteType(col, valForValidation);
                     command.Parameters[$"@{col.Name}"].Value = converted ?? DBNull.Value;
@@ -224,7 +224,7 @@ namespace MapPiloteGeopackageHelper
         /// Validates that the provided data value is compatible with the column type
         /// Made internal for testing purposes
         /// </summary>
-        internal static void ValidateDataTypeCompatibility(ColumnInfo columnInfo, string value, int index)
+        internal static void ValidateDataTypeCompatibility(ColumnInfo columnInfo, string value, int index, Action<string>? onWarning = null)
         {
             if (string.IsNullOrEmpty(value))
                 return; // Allow NULL values
@@ -268,8 +268,8 @@ namespace MapPiloteGeopackageHelper
                             "BLOB columns require special handling.");
 
                     default:
-                        // For unknown types, log warning but allow (SQLite is flexible)
-                        Console.WriteLine($"Warning: Unknown column type '{columnType}' for column '{columnInfo.Name}'. Proceeding with string value.");
+                        // For unknown types, use callback for warning but allow (SQLite is flexible)
+                        onWarning?.Invoke($"Warning: Unknown column type '{columnType}' for column '{columnInfo.Name}'. Proceeding with string value.");
                         break;
                 }
             }

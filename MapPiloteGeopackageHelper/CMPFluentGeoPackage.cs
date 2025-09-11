@@ -46,7 +46,7 @@ namespace MapPiloteGeopackageHelper
         /// <summary>
         /// Opens or creates a GeoPackage file
         /// </summary>
-        public static async Task<GeoPackage> OpenAsync(string path, int defaultSrid = 3006, CancellationToken ct = default)
+        public static async Task<GeoPackage> OpenAsync(string path, int defaultSrid = 3006, CancellationToken ct = default, Action<string>? onStatus = null)
         {
             var exists = File.Exists(path);
             
@@ -57,7 +57,7 @@ namespace MapPiloteGeopackageHelper
 
             if (!exists)
             {
-                await geoPackage.InitializeAsync(defaultSrid, ct);
+                await geoPackage.InitializeAsync(defaultSrid, ct, onStatus);
             }
 
             return geoPackage;
@@ -97,13 +97,14 @@ namespace MapPiloteGeopackageHelper
         internal SqliteConnection Connection => _connection;
         internal string Path => _path;
 
-        private async Task InitializeAsync(int srid, CancellationToken ct)
+        private async Task InitializeAsync(int srid, CancellationToken ct, Action<string>? onStatus = null)
         {
-            // Use existing creation logic
+            // Use existing creation logic with callback support
             await Task.Run(() =>
             {
                 CMPGeopackageUtils.CreateGeoPackageMetadataTables(_connection);
                 CMPGeopackageUtils.SetupSpatialReferenceSystem(_connection, srid);
+                onStatus?.Invoke($"Successfully initialized GeoPackage: {_path}");
             }, ct);
         }
 
@@ -125,11 +126,13 @@ namespace MapPiloteGeopackageHelper
             string geometryColumn,
             CancellationToken ct)
         {
-            // Use existing layer creation logic
+            // Use existing layer creation logic with callback support
             await Task.Run(() =>
             {
                 GeopackageLayerCreateHelper.CreateGeopackageLayer(
-                    _path, layerName, attributeColumns, geometryType, srid);
+                    _path, layerName, attributeColumns, geometryType, srid,
+                    onStatus: _ => { },  // Discard status messages
+                    onError: _ => { });   // Discard error messages (let exceptions bubble up)
             }, ct);
         }
 
@@ -406,7 +409,7 @@ namespace MapPiloteGeopackageHelper
                 feature.Attributes.TryGetValue(col.Name, out var raw);
                 var valForValidation = raw ?? string.Empty;
                 
-                // Use existing validation
+                // Use existing validation - no warning callback in fluent API (silent operation)
                 CGeopackageAddDataHelper.ValidateDataTypeCompatibility(col, valForValidation, idx);
 
                 // Use existing conversion logic

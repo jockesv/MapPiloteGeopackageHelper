@@ -39,13 +39,14 @@ namespace MapPiloteGeopackageHelper
         /// </summary>
         /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
         /// <param name="srid">Spatial Reference System Identifier (default 3006 for SWEREF99 TM)</param>
-        public static void CreateGeoPackage(string geoPackageFilePath, int srid = 3006)
+        /// <param name="onStatus">Optional callback for status messages</param>
+        public static void CreateGeoPackage(string geoPackageFilePath, int srid = 3006, Action<string>? onStatus = null)
         {
             // Delete existing file if it exists
             if (File.Exists(geoPackageFilePath))
             {
                 File.Delete(geoPackageFilePath);
-                Console.WriteLine($"Deleted existing GeoPackage file: {geoPackageFilePath}");
+                onStatus?.Invoke($"Deleted existing GeoPackage file: {geoPackageFilePath}");
             }
 
             using (var connection = new SqliteConnection($"Data Source={geoPackageFilePath}"))
@@ -58,7 +59,7 @@ namespace MapPiloteGeopackageHelper
                 // Set up spatial reference system
                 CMPGeopackageUtils.SetupSpatialReferenceSystem(connection, srid);
 
-                Console.WriteLine($"Successfully created GeoPackage: {geoPackageFilePath}");
+                onStatus?.Invoke($"Successfully created GeoPackage: {geoPackageFilePath}");
             }
         }
        
