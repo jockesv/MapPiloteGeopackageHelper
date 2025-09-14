@@ -475,8 +475,8 @@ namespace TestMapPiloteGeoPackageHandler
                 ["test_col"] = "TEXT"
             };
 
-            // Act & Assert - This might throw different exceptions depending on the path
-            Assert.ThrowsException<Exception>(() =>
+            // Act & Assert - File.Exists() returns false for invalid paths, triggering FileNotFoundException
+            var exception = Assert.ThrowsException<FileNotFoundException>(() =>
             {
                 GeopackageLayerCreateHelper.CreateGeopackageLayer(
                     invalidPath, 
@@ -485,9 +485,17 @@ namespace TestMapPiloteGeoPackageHandler
                     onStatus: msg => statusMessages.Add(msg),
                     onError: msg => errorMessages.Add(msg));
             });
+
+            // Verify the expected error message
+            Assert.IsTrue(exception.Message.Contains("GeoPackage file not found"), 
+                "Should throw FileNotFoundException for invalid paths");
+            Assert.IsTrue(exception.Message.Contains(invalidPath), 
+                "Should include the invalid path in error message");
             
-            // Note: Could be FileNotFoundException, DirectoryNotFoundException, 
-            // or other path-related exceptions depending on the OS and path
+            // Verify error callback was invoked
+            Assert.IsTrue(errorMessages.Count > 0, "Error callback should be invoked");
+            Assert.IsTrue(errorMessages.Any(msg => msg.Contains("Error creating GeoPackage layer")), 
+                "Should contain error callback message");
         }
 
         private static void TryDeleteFile(string path)
