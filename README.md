@@ -41,6 +41,31 @@ var count = await layer.CountAsync("population < 50000");
 var deleted = await layer.DeleteAsync("population < 10000");
 ```
 
+## WAL Mode Support (New!)
+
+Enable WAL (Write-Ahead Logging) mode for better concurrency and performance:
+
+```csharp
+// Create GeoPackage with WAL mode enabled
+CMPGeopackageCreateHelper.CreateGeoPackage(
+    "data.gpkg", 
+    srid: 3006,
+    walMode: true,
+    onStatus: Console.WriteLine);
+
+// WAL mode with default SRID (3006)
+CMPGeopackageCreateHelper.CreateGeoPackage("data.gpkg", walMode: true);
+
+// Backward compatible - existing code continues to work
+CMPGeopackageCreateHelper.CreateGeoPackage("data.gpkg", 3006);
+```
+
+### WAL Mode Benefits:
+- **Better Concurrency**: Multiple readers can access the database while a writer is active
+- **Improved Performance**: Better performance for write-heavy workloads  
+- **Atomic Commits**: Better crash recovery and data integrity
+- **No Manual PRAGMA**: No need to manually execute `PRAGMA journal_mode = WAL`
+
 ## Modern Features
 
 | Feature | Description | Example |
@@ -53,6 +78,7 @@ var deleted = await layer.DeleteAsync("population < 10000");
 | **Rich Queries** | WHERE, LIMIT, ORDER BY support | `ReadOptions(WhereClause: "pop > 1000")` |
 | **Conflict Handling** | Insert policies (Abort/Ignore/Replace) | `ConflictPolicy.Ignore` |
 | **CRUD Operations** | Count, Delete with conditions | `await layer.DeleteAsync("status = 'old'")` |
+| **WAL Mode** | Write-Ahead Logging for concurrency | `CreateGeoPackage(path, walMode: true)` |
 
 ## API Comparison
 
@@ -66,20 +92,32 @@ await layer.BulkInsertAsync(features, options, progress);
 
 ### Traditional API (Still Supported)
 ```csharp
-// Multi-step process
-CMPGeopackageCreateHelper.CreateGeoPackage(path, srid);
+// Multi-step process with optional WAL mode
+CMPGeopackageCreateHelper.CreateGeoPackage(path, srid, walMode: true);
 GeopackageLayerCreateHelper.CreateGeopackageLayer(path, name, schema);
 CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 ```
 
-## Sample Projects
+### Available CreateGeoPackage Overloads
+```csharp
+// Basic creation
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg");
 
-| Project | Purpose | API Style |
-|---------|---------|-----------|
-| **FluentApiExample** | Comprehensive modern API demo | Modern |
-| **MapPiloteGeopackageHelperHelloWorld** | Step-by-step tutorial | Traditional |
-| **MapPiloteGeopackageHelperSchemaBrowser** | Inspect unknown GeoPackages | Analysis |
-| **BulkLoadPerformaceTester** | Performance comparison | Benchmarks |
+// With custom SRID
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", srid: 4326);
+
+// With status callback
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", onStatus: Console.WriteLine);
+
+// With SRID and callback
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", 4326, Console.WriteLine);
+
+// With WAL mode (default SRID)
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", walMode: true);
+
+// Full control: SRID + WAL + callback
+CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", 4326, true, Console.WriteLine);
+```
 
 ## Reference Links (GeoPackage Specification)
 
@@ -99,6 +137,7 @@ CGeopackageAddDataHelper.BulkInsertFeatures(path, name, features);
 * Streams features back with filtering and paging  
 * Modern async patterns with cancellation support  
 * Schema inspection and validation  
+* Optional WAL mode for improved concurrency and performance
 
 ## Getting Started
 

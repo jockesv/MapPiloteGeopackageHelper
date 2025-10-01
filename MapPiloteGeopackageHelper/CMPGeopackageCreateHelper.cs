@@ -38,9 +38,69 @@ namespace MapPiloteGeopackageHelper
         /// Creates a new GeoPackage file with proper spatial metadata and tables
         /// </summary>
         /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
+        public static void CreateGeoPackage(string geoPackageFilePath)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, 3006, false, null);
+        }
+
+        /// <summary>
+        /// Creates a new GeoPackage file with proper spatial metadata and tables
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
+        /// <param name="srid">Spatial Reference System Identifier (default 3006 for SWEREF99 TM)</param>
+        public static void CreateGeoPackage(string geoPackageFilePath, int srid)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, srid, false, null);
+        }
+
+        /// <summary>
+        /// Creates a new GeoPackage file with proper spatial metadata and tables
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
         /// <param name="srid">Spatial Reference System Identifier (default 3006 for SWEREF99 TM)</param>
         /// <param name="onStatus">Optional callback for status messages</param>
-        public static void CreateGeoPackage(string geoPackageFilePath, int srid = 3006, Action<string>? onStatus = null)
+        public static void CreateGeoPackage(string geoPackageFilePath, int srid, Action<string>? onStatus)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, srid, false, onStatus);
+        }
+
+        /// <summary>
+        /// Creates a new GeoPackage file with proper spatial metadata and tables
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
+        /// <param name="onStatus">Optional callback for status messages</param>
+        public static void CreateGeoPackage(string geoPackageFilePath, Action<string>? onStatus)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, 3006, false, onStatus);
+        }
+
+        /// <summary>
+        /// Creates a new GeoPackage file with proper spatial metadata and tables
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
+        /// <param name="srid">Spatial Reference System Identifier (default 3006 for SWEREF99 TM)</param>
+        /// <param name="walMode">Enable WAL (Write-Ahead Logging) mode for better concurrency and performance</param>
+        /// <param name="onStatus">Optional callback for status messages</param>
+        public static void CreateGeoPackage(string geoPackageFilePath, int srid, bool walMode, Action<string>? onStatus = null)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, srid, walMode, onStatus);
+        }
+
+        /// <summary>
+        /// Creates a new GeoPackage file with proper spatial metadata and tables with WAL mode
+        /// </summary>
+        /// <param name="geoPackageFilePath">Path where the GeoPackage file will be created</param>
+        /// <param name="walMode">Enable WAL (Write-Ahead Logging) mode for better concurrency and performance</param>
+        /// <param name="onStatus">Optional callback for status messages</param>
+        public static void CreateGeoPackage(string geoPackageFilePath, bool walMode, Action<string>? onStatus = null)
+        {
+            CreateGeoPackageInternal(geoPackageFilePath, 3006, walMode, onStatus);
+        }
+
+        /// <summary>
+        /// Internal implementation of GeoPackage creation
+        /// </summary>
+        private static void CreateGeoPackageInternal(string geoPackageFilePath, int srid, bool walMode, Action<string>? onStatus)
         {
             // Delete existing file if it exists
             if (File.Exists(geoPackageFilePath))
@@ -52,6 +112,13 @@ namespace MapPiloteGeopackageHelper
             using (var connection = new SqliteConnection($"Data Source={geoPackageFilePath}"))
             {
                 connection.Open();
+
+                // Configure WAL mode if requested
+                if (walMode)
+                {
+                    CMPGeopackageUtils.ExecuteCommand(connection, "PRAGMA journal_mode = WAL");
+                    onStatus?.Invoke("Enabled WAL (Write-Ahead Logging) mode for improved concurrency");
+                }
 
                 // Create required GeoPackage system tables
                 CMPGeopackageUtils.CreateGeoPackageMetadataTables(connection);
