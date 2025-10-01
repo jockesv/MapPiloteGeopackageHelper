@@ -1,7 +1,7 @@
 # MapPiloteGeopackageHelper
 
 Modern .NET library for creating, reading, and bulk-loading GeoPackage (GPKG) data using SQLite and NetTopologySuite.
-Note that in version 1.2.0 I have split the repository on github into two, hope it simplifies understanding:
+Note that in version 1.2.1 I have split the repository on github into two, hope it simplifies understanding:
 - [MapPiloteGeopackageHelper](https://github.com/kartpiloten/MapPiloteGeopackageHelper)
     The core library with tests.
 - [MapPiloteGeopackageHelperExamples](https://github.com/kartpiloten/MapPiloteGeopackageHelperExamples)
