@@ -232,5 +232,61 @@ namespace TestMapPiloteGeoPackageHandler
                 }
             }
         }
+
+        [TestMethod]
+        public async Task FluentApi_OrderBy_ShouldWork()
+        {
+            string gpkg = CreateTempGpkgPath();
+            try
+            {
+                // Arrange
+                var schema = new Dictionary<string, string> { ["score"] = "INTEGER", ["name"] = "TEXT" };
+                var features = new[]
+                {
+                    new FeatureRecord(new Point(1, 1), new Dictionary<string, string?> { ["score"] = "50", ["name"] = "Bob" }),
+                    new FeatureRecord(new Point(2, 2), new Dictionary<string, string?> { ["score"] = "90", ["name"] = "Alice" }),
+                    new FeatureRecord(new Point(3, 3), new Dictionary<string, string?> { ["score"] = "70", ["name"] = "Charlie" }),
+                    new FeatureRecord(new Point(4, 4), new Dictionary<string, string?> { ["score"] = "60", ["name"] = "Diana" }),
+                };
+
+                // Act
+                using var geoPackage = await GeoPackage.OpenAsync(gpkg);
+                var layer = await geoPackage.EnsureLayerAsync("test_layer", schema);
+                await layer.BulkInsertAsync(features);
+
+                // Read with ORDER BY ASC
+                var ascResults = new List<FeatureRecord>();
+                await foreach (var feature in layer.ReadFeaturesAsync(new ReadOptions(OrderBy: "score ASC")))
+                {
+                    ascResults.Add(feature);
+                }
+
+                // Read with ORDER BY DESC
+                var descResults = new List<FeatureRecord>();
+                await foreach (var feature in layer.ReadFeaturesAsync(new ReadOptions(OrderBy: "score DESC")))
+                {
+                    descResults.Add(feature);
+                }
+
+                // Assert ASC order
+                Assert.AreEqual("Bob", ascResults[0].Attributes["name"]);    // 50
+                Assert.AreEqual("Diana", ascResults[1].Attributes["name"]);  // 60
+                Assert.AreEqual("Charlie", ascResults[2].Attributes["name"]); // 70
+                Assert.AreEqual("Alice", ascResults[3].Attributes["name"]);  // 90
+
+                // Assert DESC order
+                Assert.AreEqual("Alice", descResults[0].Attributes["name"]);   // 90
+                Assert.AreEqual("Charlie", descResults[1].Attributes["name"]); // 70
+                Assert.AreEqual("Diana", descResults[2].Attributes["name"]);   // 60
+                Assert.AreEqual("Bob", descResults[3].Attributes["name"]);     // 50
+            }
+            finally
+            {
+                if (File.Exists(gpkg))
+                {
+                    try { File.Delete(gpkg); } catch { }
+                }
+            }
+        }
     }
 }

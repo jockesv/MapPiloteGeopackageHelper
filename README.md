@@ -1,6 +1,9 @@
 # MapPiloteGeopackageHelper
 
 Modern .NET library for creating, reading, and bulk-loading GeoPackage (GPKG) data using SQLite and NetTopologySuite.
+
+**Latest Release: v1.2.2** - Fixed ORDER BY clause in `ReadFeaturesAsync` (ASC/DESC sorting now works correctly)
+
 Note that in version 1.2.1 I have split the repository on github into two, hope it simplifies understanding:
 - [MapPiloteGeopackageHelper](https://github.com/kartpiloten/MapPiloteGeopackageHelper)
     The core library with tests.
@@ -29,9 +32,12 @@ await layer.BulkInsertAsync(features,
     new BulkInsertOptions(BatchSize: 1000, CreateSpatialIndex: true),
     progress);
 
-// Query with async streaming
+// Query with async streaming and ORDER BY support
 await foreach (var city in layer.ReadFeaturesAsync(
-    new ReadOptions(WhereClause: "population > 100000", Limit: 10)))
+    new ReadOptions(
+        WhereClause: "population > 100000", 
+        OrderBy: "population DESC",  // ? Fixed in v1.2.2
+        Limit: 10)))
 {
     Console.WriteLine($"City: {city.Attributes["name"]} - {city.Attributes["population"]} people");
 }
@@ -75,7 +81,7 @@ CMPGeopackageCreateHelper.CreateGeoPackage("data.gpkg", 3006);
 | **Progress Reporting** | Track long-running operations | `IProgress<BulkProgress>` |
 | **Options Objects** | Clean configuration, no parameter soup | `BulkInsertOptions(BatchSize: 1000)` |
 | **Streaming** | `IAsyncEnumerable` for large datasets | `await foreach (var item in ...)` |
-| **Rich Queries** | WHERE, LIMIT, ORDER BY support | `ReadOptions(WhereClause: "pop > 1000")` |
+| **Rich Queries** | WHERE, LIMIT, ORDER BY support | `ReadOptions(OrderBy: "score DESC")` |
 | **Conflict Handling** | Insert policies (Abort/Ignore/Replace) | `ConflictPolicy.Ignore` |
 | **CRUD Operations** | Count, Delete with conditions | `await layer.DeleteAsync("status = 'old'")` |
 | **WAL Mode** | Write-Ahead Logging for concurrency | `CreateGeoPackage(path, walMode: true)` |
@@ -119,6 +125,21 @@ CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", walMode: true);
 CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", 4326, true, Console.WriteLine);
 ```
 
+## Version History
+
+### v1.2.2 (Latest)
+- **Fixed**: ORDER BY clause in `ReadFeaturesAsync` now works correctly with both ASC and DESC
+- **Test Coverage**: Added comprehensive ORDER BY tests
+
+### v1.2.1
+- **Added**: WAL mode support for better concurrency
+- **Split**: Repository separated from examples for clarity
+
+### v1.2.0
+- **Added**: Modern Fluent API with async/await support
+- **Added**: Progress reporting for bulk operations
+- **Added**: Rich query options (WHERE, LIMIT, OFFSET, ORDER BY)
+
 ## Reference Links (GeoPackage Specification)
 
 - **GeoPackage Encoding Standard** - https://www.geopackage.org/spec/
@@ -134,7 +155,7 @@ CMPGeopackageCreateHelper.CreateGeoPackage("path.gpkg", 4326, true, Console.Writ
 * Creates GeoPackages with required core tables  
 * Creates layers (tables) with geometry + custom attribute columns  
 * Bulk writes features with validation and progress tracking  
-* Streams features back with filtering and paging  
+* Streams features back with filtering, sorting, and paging  
 * Modern async patterns with cancellation support  
 * Schema inspection and validation  
 * Optional WAL mode for improved concurrency and performance

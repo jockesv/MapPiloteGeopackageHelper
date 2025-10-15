@@ -350,6 +350,9 @@ namespace MapPiloteGeopackageHelper
             
             if (!string.IsNullOrEmpty(options.WhereClause))
                 sql += $" WHERE {options.WhereClause}";
+            
+            if (!string.IsNullOrEmpty(options.OrderBy))
+                sql += $" ORDER BY {options.OrderBy}";
                 
             if (options.Limit.HasValue)
                 sql += $" LIMIT {options.Limit}";
